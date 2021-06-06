@@ -16,6 +16,7 @@
 
 .TODO
   - redo as PS-Module with parameters
+  - identifiy relevant "* Driver Update]" lines
          
 .CHANGELOG
   0.1
@@ -118,14 +119,17 @@ if(Test-Path $SetupapiPath)
                 $TempRelevantDeviceLines += $line
             }
 
-            #Add Entry to Array of RelevantDeviceEntrys
-                $TempRelevantDeviceEntry = [DeviceEntry]::new()
-                $TempRelevantDeviceEntry.Type = $Type
-                $TempRelevantDeviceEntry.time = $Time
-                $TempRelevantDeviceEntry.lines = $TempRelevantDeviceLines
+            #If $TempRelevantDeviceLines not empty
+            if($TempRelevantDeviceLines.Count -gt 0)
+            {
+                #Add Entry to Array of RelevantDeviceEntrys
+                    $TempRelevantDeviceEntry = [DeviceEntry]::new()
+                    $TempRelevantDeviceEntry.Type = $Type
+                    $TempRelevantDeviceEntry.time = $Time
+                    $TempRelevantDeviceEntry.lines = $TempRelevantDeviceLines
 
-                $RelevantDeviceEntrys += $TempRelevantDeviceEntry
-
+                    $RelevantDeviceEntrys += $TempRelevantDeviceEntry
+            }
             #Prepare for search of next relevant entry
                 $TempRelevantDeviceLines = @()
                 $line = ""
