@@ -45,7 +45,10 @@ function Copy-fmItemUsingExplorer{
             $DestinationExplorerWindowsTitle = Split-Path -Path $DestinationFolderPath -Leaf
 
         #Open Explorer select file, to generate artifacts, for example Thumbnails
-            #Parameters to launch explorer.exe with            $Params = @()                $Params += "/select,"                $Params += "$($SourceFilePath)"
+            #Parameters to launch explorer.exe with
+            $Params = @()
+                $Params += "/select,"
+                $Params += "$($SourceFilePath)"
             Start-Process explorer.exe $Params #Start-Process explorer.exe -ArgumentList '/select, ""C:\Users\hanshack\Pictures\Product.bmp""'
             Start-Sleep -Milliseconds 3000
         #Focus Explorer Window
@@ -60,7 +63,10 @@ function Copy-fmItemUsingExplorer{
             Get-Process -Name explorer | Where-Object {$_.MainWindowTitle -eq $SourceExplorerWindowsTitle} | Stop-Process
 
         #Open Explorer select file, to generate artifacts, for example Thumbnails
-            #Parameters to launch explorer.exe with            $Params = @()                $Params += "/select,"                $Params += "$($DestinationFolderPath)\$(Split-Path -Path $SourceFilePath -Leaf)"
+            #Parameters to launch explorer.exe with
+            $Params = @()
+                $Params += "/select,"
+                $Params += "$($DestinationFolderPath)$(Split-Path -Path $SourceFilePath -Leaf)"
             Start-Process explorer.exe $Params #Start-Process explorer.exe -ArgumentList '/select, ""C:\Users\hanshack\Pictures\Product.bmp""'
             Start-Sleep -Milliseconds 3000
         #Focus Explorer Window
