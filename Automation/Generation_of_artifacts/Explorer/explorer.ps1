@@ -83,7 +83,7 @@ function Copy-fmItemUsingExplorer{
                 if($pathlength -gt 0 -and $pathlength -le 3)
                 {
                     $volumedriveletter = $DestinationFolderPath[0]
-                    $volumelabel = (Get-Volume $volumename).FileSystemLabel
+                    $volumelabel = (Get-Volume $volumedriveletter).FileSystemLabel
                 }
             #Parameters to launch explorer.exe with
             $Params = @()
