@@ -4,7 +4,10 @@
             Add-Type -Name win -MemberDefinition '[DllImport("user32.dll")] public static extern bool ShowWindow(int handle, int state);' -Namespace native
             [native.win]::ShowWindow(([System.Diagnostics.Process]::GetCurrentProcess() | Get-Process).MainWindowHandle,0)
     }
-    
+
+        Add-Type -AssemblyName Microsoft.VisualBasic
+        Add-Type -AssemblyName System.Windows.Forms
+
 function Copy-fmItemUsingExplorer{
 # Opens Explorer with SourceFile selected, copies SourceFile to DestinationFolder, closes this Explorer Windows and reopens
 # Explorer with Destination File selected and closes Explorer Windows again.
@@ -71,7 +74,17 @@ function Copy-fmItemUsingExplorer{
                 $Params += "/select,"
                 $Params += "$($SourceFilePath)"
             Start-Process explorer.exe $Params #Start-Process explorer.exe -ArgumentList '/select, ""C:\Users\hanshack\Pictures\Product.bmp""'
-            Start-Sleep -Milliseconds 2000
+            $explorerwindowsstarted = $false
+            $i = 0
+            do
+            {
+                Start-Sleep -Milliseconds 1000
+                $explorerwindowsstartedtitle = Get-Process -Name explorer | Where-Object {$_.MainWindowTitle -eq $SourceExplorerWindowTitle}
+                if($explorerwindowsstartedtitle.MainWindowTitle -eq $SourceExplorerWindowTitle)
+                    {$explorerwindowsstarted = $true}
+                $i++
+           }while(($explorerwindowsstarted -eq $false) -and ($i -lt 10))
+           Start-Sleep -Milliseconds 1000
         #Copy File with Explorer (COM) - not via Copy-Item, maybe this generates more User like artifacts...
             $objShell = New-Object -ComObject 'Shell.Application'    
             $objFolder = $objShell.NameSpace((Get-Item $DestinationFolderPath).FullName)
@@ -97,7 +110,19 @@ function Copy-fmItemUsingExplorer{
             Write-Host $Params
             Start-Sleep -Milliseconds 500
             Start-Process explorer.exe $Params #Start-Process explorer.exe -ArgumentList '/select, ""C:\Users\hanshack\Pictures\Product.bmp""'
-           Start-Sleep -Milliseconds 2000
+            $explorerwindowsstarted = $false
+            $i = 0
+            do
+            {
+                Start-Sleep -Milliseconds 1000
+                $explorerwindowsstartedtitle = Get-Process -Name explorer | Where-Object {$_.MainWindowTitle -eq $SourceExplorerWindowTitle}
+                if($explorerwindowsstartedtitle.MainWindowTitle -eq $SourceExplorerWindowTitle)
+                    {$explorerwindowsstarted = $true}
+                $i++
+           }while(($explorerwindowsstarted -eq $false) -and ($i -lt 15))
+           Start-Sleep -Milliseconds 1000
+
+           #Get-Process -Name explorer | Where-Object {$_.MainWindowTitle -eq $SourceExplorerWindowTitle} | Stop-Process
 
         #Focus Explorer Window
             #Check if DestinationFolderPath is Root of Volume
@@ -110,13 +135,13 @@ function Copy-fmItemUsingExplorer{
                 #$wshell.AppActivate($DestinationExplorerWindowTitle) | Out-Null
                 #Start-Sleep -Milliseconds 100
             [System.Windows.Forms.SendKeys]::SendWait(“%{TAB}”)
-            Start-Sleep -Milliseconds 2000
+            Start-Sleep -Milliseconds 1000
 
             #Start Photos with Enter to generate Recent items entry (C:\Users\USERNAME\AppData\Roaming\Microsoft\Windows\Recent)
             if($SourceFilePath -eq "C:\Users\hanshack\Pictures\Motor.JPG")
             {
                 [System.Windows.Forms.SendKeys]::SendWait(“{ENTER}”)
-                Start-Sleep -Milliseconds 10000
+                Start-Sleep -Milliseconds 8000
                 Get-Process -Name Microsoft.Photos | Stop-Process  # FileName is not in WindowsTitle!
             }
 
@@ -144,6 +169,10 @@ Start-Sleep -Seconds 5
     $DestinationFolderPath = "$($USBDriveLetter)\"
 
 ################
+    $SourceFilePath = "C:\Users\hanshack\Pictures\Motor.JPG"
+    Copy-fmItemUsingExplorer -source $SourceFilePath -destination $DestinationFolderPath -CopyFlags 80
+
+################
     $SourceFilePath = "Z:\Company_files\Product_Prices.docx"
     Copy-fmItemUsingExplorer -source $SourceFilePath -destination $DestinationFolderPath -CopyFlags 80
 
@@ -160,13 +189,11 @@ Start-Sleep -Seconds 5
     Copy-fmItemUsingExplorer -source $SourceFilePath -destination $DestinationFolderPath -CopyFlags 80
 
 ################
-    $SourceFilePath = "C:\Users\hanshack\Pictures\Motor.JPG"
-    Copy-fmItemUsingExplorer -source $SourceFilePath -destination $DestinationFolderPath -CopyFlags 80
-################
+
 
 #Open Excel
     explorer.exe "$($USBDriveLetter)\customer-list.xlsx"
-        Start-Sleep -Milliseconds 10000
+        Start-Sleep -Milliseconds 8000
         Get-Process -Name EXCEL | Stop-Process
 
 #Open Photo 
@@ -175,6 +202,6 @@ Start-Sleep -Seconds 5
         #Start-Sleep -Milliseconds 10000
         #Get-Process -Name Microsoft.Photos | Stop-Process
 
-Eject USB Drive
+#Eject USB Drive
     $Eject =  New-Object -ComObject Shell.Application
     $Eject.NameSpace(17).ParseName($USBDriveLetter).InvokeVerb("Eject")
