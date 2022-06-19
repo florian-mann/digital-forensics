@@ -4,7 +4,7 @@
  Version 0.1, 06.06.2021, AUTHOR: Florian Mann
  
 .SYNOPSYS
-  Pase setupapi.dev.log for specific DeviceIDs
+  Parse setupapi.dev.log for specific DeviceIDs
 
 .NOTES
 
